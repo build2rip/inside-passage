@@ -215,21 +215,21 @@
       border-radius: 10px;
       max-width: 640px;
       width: 90%;
-      max-height: 80vh;
+      max-height: 88vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
 
     .modal-header {
-      padding: 18px 22px 14px;
+      padding: 20px 28px 14px;
       border-bottom: 1px solid #1e3a55;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
 
-    .modal-header h3 { font-size: 1.1rem; color: #a8d4f0; margin-bottom: 4px; }
+    .modal-header h3 { font-size: 1.2rem; font-weight: 700; color: #a8d4f0; margin-bottom: 5px; }
     .modal-header p { font-size: 0.8rem; color: #5a8aaa; }
 
     .modal-close {
@@ -245,12 +245,17 @@
     .modal-close:hover { color: #a8d4f0; }
 
     .modal-body {
-      padding: 18px 22px;
+      padding: 22px 28px;
       overflow-y: auto;
       flex: 1;
-      font-size: 0.88rem;
-      line-height: 1.9;
-      color: #c8dce8;
+      font-size: 0.95rem;
+      line-height: 2.0;
+      color: #d8e8f0;
+    }
+
+    .modal-body p {
+      margin: 0 0 1em 0;
+      max-width: 580px;
     }
 
     .modal-body::-webkit-scrollbar { width: 4px; }
