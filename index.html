@@ -299,6 +299,81 @@
       width: 100%;
     }
     .popup-btn:hover { background: #265a84; }
+
+    /* ── 手機版 ── */
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 14px;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      header h1 { font-size: 1rem; }
+      header p { font-size: 0.7rem; }
+      .header-badges { display: none; }
+
+      .main {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: unset;
+        height: 42vh;
+        border-right: none;
+        border-top: 1px solid #1e3a55;
+        order: 2;
+      }
+
+      .map-wrap {
+        flex: unset;
+        height: 55vh;
+        order: 1;
+      }
+
+      /* 地圖/日誌切換按鈕 */
+      .mobile-tabs {
+        display: flex;
+        order: 0;
+        background: #081525;
+        border-bottom: 1px solid #1e3a55;
+        flex-shrink: 0;
+      }
+      .mobile-tab {
+        flex: 1;
+        padding: 8px;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #5a8aaa;
+        cursor: pointer;
+        border: none;
+        background: none;
+        transition: color 0.2s, border-bottom 0.2s;
+        border-bottom: 2px solid transparent;
+      }
+      .mobile-tab.active {
+        color: #a8d4f0;
+        border-bottom: 2px solid #3a8ac4;
+      }
+
+      /* 切換時隱藏/顯示 */
+      .main.show-map .sidebar { display: none; }
+      .main.show-map .map-wrap { height: calc(100vh - var(--header-h, 90px)); }
+      .main.show-list .map-wrap { display: none; }
+      .main.show-list .sidebar { height: calc(100vh - var(--header-h, 90px)); }
+
+      /* 全螢幕 modal */
+      .modal {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 0;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-tabs { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -308,14 +383,19 @@
     <h1>🛶 郭熊的內灣航道冒險</h1>
     <p>2025 年 6 月 — 8 月　獨木舟穿越 Inside Passage</p>
   </div>
-  <div style="margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;">
+  <div class="header-badges" style="margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;">
     <span class="badge">📍 溫哥華島 → 史凱威</span>
     <span class="badge">🌊 全程 1,600+ 公里</span>
     <span class="badge">📅 61 天</span>
   </div>
 </header>
 
-<div class="main">
+<div class="mobile-tabs" id="mobileTabs">
+  <button class="mobile-tab active" onclick="switchTab('map')">🗺 地圖</button>
+  <button class="mobile-tab" onclick="switchTab('list')">📋 日誌</button>
+</div>
+
+<div class="main" id="mainWrap">
   <div class="sidebar">
     <div class="sidebar-header">
       <h2>旅程日誌</h2>
@@ -1979,6 +2059,19 @@ JOURNEY.forEach((entry, idx) => {
 });
 
 // ── 選擇條目 ─────────────────────────────────────────────
+function switchTab(tab) {
+  const main = document.getElementById('mainWrap');
+  const tabs = document.querySelectorAll('.mobile-tab');
+  main.classList.remove('show-map', 'show-list');
+  main.classList.add(tab === 'map' ? 'show-map' : 'show-list');
+  tabs[0].classList.toggle('active', tab === 'map');
+  tabs[1].classList.toggle('active', tab === 'list');
+  if (tab === 'map') setTimeout(() => map.invalidateSize(), 10);
+}
+
+// 初始化：手機預設顯示地圖
+if (window.innerWidth <= 768) switchTab('map');
+
 function selectEntry(idx) {
   if (activeIdx >= 0) {
     document.getElementById(`entry-${activeIdx}`).classList.remove('active');
@@ -1989,6 +2082,7 @@ function selectEntry(idx) {
   document.getElementById(`entry-${idx}`).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   markers[idx].setIcon(makeIcon(JOURNEY[idx].country, true));
+  if (window.innerWidth <= 768) switchTab('map');
   map.flyTo(JOURNEY[idx].coords, 8, { duration: 1.2 });
   markers[idx].openPopup();
 
