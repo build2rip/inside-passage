@@ -254,8 +254,19 @@
     }
 
     .modal-body p {
-      margin: 0 0 1em 0;
+      margin: 0 0 1.2em 0;
       max-width: 580px;
+      text-indent: 2em;
+    }
+
+    .article-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #7ab4d4;
+      margin: 1.6em 0 0.5em 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #1e3a55;
+      letter-spacing: 0.05em;
     }
 
     .modal-body::-webkit-scrollbar { width: 4px; }
@@ -2152,9 +2163,28 @@ function renderModalBody(idx) {
   const saved = localStorage.getItem('text_' + idx);
   const text = saved !== null ? saved : e.text;
   const imgs = JSON.parse(localStorage.getItem('imgs_' + idx) || '[]');
-  let html = '<p>' + text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\n\n/g, '</p><p>') + '</p>';
+
+  // 先 escape HTML
+  const escaped = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // 切成段落（雙換行）
+  const blocks = escaped.split(/\n\n+/);
+
+  let html = blocks.map(block => {
+    // 段落內單個 \n 合併（PDF 換行殘留），合成一行
+    const joined = block.replace(/\n/g, ' ').trim();
+    if (!joined) return '';
+
+    // # 開頭 → 小標題
+    if (/^#/.test(joined)) {
+      const title = joined.replace(/^#+\s*/, '');
+      return `<h4 class="article-heading">${title}</h4>`;
+    }
+
+    return `<p>${joined}</p>`;
+  }).filter(Boolean).join('\n');
+
   if (imgs.length) html += '<div class="modal-imgs">' + imgs.map(src => `<img src="${src}">`).join('') + '</div>';
   document.getElementById('modalBody').innerHTML = html;
 }
